@@ -4,22 +4,14 @@ import os
 import uuid
 import pandas as pd
 from utils.angle import create_p1_p2_p3, find_angle
-from utils.misc import create_folder
+from utils.misc import create_folder, read_yaml_config
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
 OUTPUT_FOLDER = "./data4"
-KEY_LABEL_MAP = {
-    "g": "greifen",
-    "e": "ein",
-    "a": "aus",
-    "s": "schneller",
-    "l": "langsamer",
-    "r": "richtungsaenderung",
-    "n": "nothalt",
-    "x": "no_gesture",
-}
+
+key_label_map = {value: key for key, value in read_yaml_config("labels.yml").items()}
 
 headers = (
     ["label"]
@@ -28,7 +20,7 @@ headers = (
 )
 annotations_output = {key: [] for key in headers}
 annotations_csv = os.path.join(OUTPUT_FOLDER, "annotations.csv")
-keys = [ord(key) for key in list(KEY_LABEL_MAP.keys())]
+keys = [ord(key) for key in list(key_label_map.keys())]
 counter = 0
 
 cap = cv2.VideoCapture(0)
@@ -68,7 +60,7 @@ with mp_hands.Hands(
 
             if key in keys:
 
-                label = KEY_LABEL_MAP[chr(key)]
+                label = key_label_map[chr(key)]
                 annotations_output["label"].append(label)
 
                 for i, landmark in enumerate(results.multi_hand_landmarks[0].landmark):

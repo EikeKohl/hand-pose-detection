@@ -3,23 +3,15 @@ import numpy as np
 import cv2
 import mediapipe as mp
 from utils.angle import create_p1_p2_p3, find_angle
+from utils.misc import read_yaml_config
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
 model = tf.keras.models.load_model("model")
 
-label_map = {
-    3: "greifen",
-    1: "ein",
-    2: "aus",
-    4: "schneller",
-    5: "langsamer",
-    6: "richtungsaenderung",
-    7: "nothalt",
-    0: "no_gesture",
-}
-
+config = read_yaml_config("labels.yml")
+label_map = {idx: key for idx, key in enumerate(config.keys())}
 
 cap = cv2.VideoCapture(0)
 with mp_hands.Hands(
